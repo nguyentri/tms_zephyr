@@ -1,0 +1,161 @@
+/*
+ * M4 Core Device Tree Overlay
+ * MIMXRT1160-EVK Board Configuration
+ */
+
+/ {
+    /* Shared memory for OpenAMP IPC */
+    vdev0_shm: vdev0_shm@200c0000 {
+        compatible = "mmio-sram";
+        reg = <0x200c0000 0x4000>; /* 16KB shared memory */
+    };
+    
+    /* Aliases for easier access */
+    aliases {
+        led0 = &user_led;
+        pwm0 = &flexpwm1_pwm0;
+        adc0 = &adc1;
+    };
+    
+    /* LEDs for M4 status */
+    leds {
+        compatible = "gpio-leds";
+        user_led: led_0 {
+            gpios = <&gpio9 4 GPIO_ACTIVE_LOW>;
+            label = "M4 Status LED";
+        };
+    };
+    
+    /* PWM outputs for fan control */
+    pwm_outputs {
+        compatible = "pwm-leds";
+        
+        fan1 {
+            pwms = <&flexpwm1_pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+            label = "Fan 1 Control";
+        };
+        
+        fan2 {
+            pwms = <&flexpwm1_pwm1 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+            label = "Fan 2 Control";
+        };
+    };
+};
+
+/* Enable MU1 for inter-core communication */
+&mu1 {
+    status = "okay";
+};
+
+/* Enable ADC1 for analog measurements */
+&adc1 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_adc1>;
+    pinctrl-names = "default";
+    
+    #address-cells = <1>;
+    #size-cells = <0>;
+    
+    /* Voltage measurement channel */
+    channel@0 {
+        reg = <0>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+        zephyr,resolution = <12>;
+    };
+    
+    /* Current measurement channel */
+    channel@1 {
+        reg = <1>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+        zephyr,resolution = <12>;
+    };
+    
+    /* Temperature measurement channel */
+    channel@2 {
+        reg = <2>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+        zephyr,resolution = <12>;
+    };
+};
+
+/* Enable PWM for fan control */
+&flexpwm1_pwm0 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_flexpwm1_pwm0>;
+    pinctrl-names = "default";
+};
+
+&flexpwm1_pwm1 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_flexpwm1_pwm1>;
+    pinctrl-names = "default";
+};
+
+/* Enable I2C2 for local sensors */
+&lpi2c2 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_lpi2c2>;
+    pinctrl-names = "default";
+    
+    /* Accelerometer for vibration monitoring */
+    lis2dh@18 {
+        compatible = "st,lis2dh";
+        reg = <0x18>;
+        label = "LIS2DH";
+    };
+};
+
+/* Enable SPI for high-speed ADC */
+&lpspi2 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_lpspi2>;
+    pinctrl-names = "default";
+    
+    /* External high-speed ADC */
+    adc_ext: ads131m04@0 {
+        compatible = "ti,ads131m04";
+        reg = <0>;
+        spi-max-frequency = <8000000>;
+        label = "ADS131M04";
+    };
+};
+
+/* Enable GPT2 for precise timing */
+&gpt2 {
+    status = "okay";
+};
+
+/* Enable PIT for periodic interrupts */
+&pit {
+    status = "okay";
+};
+
+/* GPIO configuration for relays and digital I/O */
+&gpio_ad_04 {
+    status = "okay";
+};
+
+&gpio9 {
+    status = "okay";
+};
+
+&gpio1 {
+    status = "okay";
+};
+
+&gpio2 {
+    status = "okay";
+};
+
+/* Chosen node for Zephyr configuration */
+/chosen {
+    zephyr,ipc-shm = &vdev0_shm;
+    zephyr,sram = &ocram;
+    zephyr,console = &lpuart2;
+};

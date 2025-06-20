@@ -1,0 +1,165 @@
+/*
+ * M7 Core Device Tree Overlay
+ * MIMXRT1160-EVK Board Configuration
+ */
+
+/ {
+    /* Shared memory for OpenAMP IPC */
+    vdev0_shm: vdev0_shm@200c0000 {
+        compatible = "mmio-sram";
+        reg = <0x200c0000 0x4000>; /* 16KB shared memory */
+    };
+    
+    /* Reserved memory regions */
+    reserved-memory {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges;
+        
+        /* M4 code region */
+        m4_code: m4_code@20200000 {
+            reg = <0x20200000 0x40000>; /* 256KB for M4 code */
+            no-map;
+        };
+        
+        /* Shared data region */
+        shared_data: shared_data@20240000 {
+            reg = <0x20240000 0x10000>; /* 64KB for shared data */
+        };
+    };
+    
+    /* Aliases for easier access */
+    aliases {
+        led0 = &user_led;
+        sw0 = &user_button;
+        modbus0 = &lpuart1;
+        console = &lpuart1;
+    };
+    
+    /* LEDs */
+    leds {
+        compatible = "gpio-leds";
+        user_led: led_0 {
+            gpios = <&gpio9 3 GPIO_ACTIVE_LOW>;
+            label = "User LED";
+        };
+        status_led: led_1 {
+            gpios = <&gpio9 25 GPIO_ACTIVE_LOW>;
+            label = "Status LED";
+        };
+    };
+    
+    /* Buttons */
+    gpio_keys {
+        compatible = "gpio-keys";
+        user_button: button_0 {
+            gpios = <&gpio13 0 GPIO_ACTIVE_LOW>;
+            label = "User Button";
+        };
+    };
+};
+
+/* Enable MU1 for inter-core communication */
+&mu1 {
+    status = "okay";
+};
+
+/* Enable SEMC for external memory */
+&semc {
+    status = "okay";
+};
+
+/* Enable SD card interface */
+&usdhc1 {
+    status = "okay";
+    cd-gpios = <&gpio3 19 GPIO_ACTIVE_LOW>;
+    pwr-gpios = <&gpio3 16 GPIO_ACTIVE_HIGH>;
+    pinctrl-0 = <&pinmux_usdhc1>;
+    pinctrl-names = "default";
+};
+
+/* Enable Ethernet for network communication */
+&enet {
+    status = "okay";
+    pinctrl-0 = <&pinmux_enet>;
+    pinctrl-names = "default";
+    phy-mode = "rmii";
+    phy-handle = <&phy>;
+    
+    mdio {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        
+        phy: phy@0 {
+            compatible = "ethernet-phy";
+            reg = <0>;
+        };
+    };
+};
+
+/* Enable LPUART1 for Modbus RTU */
+&lpuart1 {
+    status = "okay";
+    current-speed = <115200>;
+    pinctrl-0 = <&pinmux_lpuart1>;
+    pinctrl-names = "default";
+};
+
+/* Enable LPUART2 for debug console */
+&lpuart2 {
+    status = "okay";
+    current-speed = <115200>;
+};
+
+/* Enable I2C1 for sensors */
+&lpi2c1 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_lpi2c1>;
+    pinctrl-names = "default";
+    
+    /* Temperature/Humidity sensor */
+    sht3x@44 {
+        compatible = "sensirion,sht3x";
+        reg = <0x44>;
+        label = "SHT3X";
+    };
+};
+
+/* Enable SPI for high-speed communication */
+&lpspi1 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_lpspi1>;
+    pinctrl-names = "default";
+};
+
+/* Enable GPT1 for timing */
+&gpt1 {
+    status = "okay";
+};
+
+/* Enable RTC */
+&snvs_rtc {
+    status = "okay";
+};
+
+/* GPIO configuration */
+&gpio_ad_04 {
+    status = "okay";
+};
+
+&gpio9 {
+    status = "okay";
+};
+
+&gpio13 {
+    status = "okay";
+};
+
+/* Chosen node for Zephyr configuration */
+/chosen {
+    zephyr,console = &lpuart2;
+    zephyr,shell-uart = &lpuart2;
+    zephyr,ipc-shm = &vdev0_shm;
+    zephyr,sram = &ocram;
+    zephyr,flash = &flash0;
+};
