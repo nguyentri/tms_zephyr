@@ -9,14 +9,14 @@
         compatible = "mmio-sram";
         reg = <0x200c0000 0x4000>; /* 16KB shared memory */
     };
-    
+
     /* Aliases for easier access */
     aliases {
         led0 = &user_led;
         pwm0 = &flexpwm1_pwm0;
         adc0 = &adc1;
     };
-    
+
     /* LEDs for M4 status */
     leds {
         compatible = "gpio-leds";
@@ -25,16 +25,16 @@
             label = "M4 Status LED";
         };
     };
-    
+
     /* PWM outputs for fan control */
     pwm_outputs {
         compatible = "pwm-leds";
-        
+
         fan1 {
             pwms = <&flexpwm1_pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
             label = "Fan 1 Control";
         };
-        
+
         fan2 {
             pwms = <&flexpwm1_pwm1 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
             label = "Fan 2 Control";
@@ -52,10 +52,10 @@
     status = "okay";
     pinctrl-0 = <&pinmux_adc1>;
     pinctrl-names = "default";
-    
+
     #address-cells = <1>;
     #size-cells = <0>;
-    
+
     /* Voltage measurement channel */
     channel@0 {
         reg = <0>;
@@ -64,7 +64,7 @@
         zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
         zephyr,resolution = <12>;
     };
-    
+
     /* Current measurement channel */
     channel@1 {
         reg = <1>;
@@ -73,7 +73,7 @@
         zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
         zephyr,resolution = <12>;
     };
-    
+
     /* Temperature measurement channel */
     channel@2 {
         reg = <2>;
@@ -102,7 +102,7 @@
     status = "okay";
     pinctrl-0 = <&pinmux_lpi2c2>;
     pinctrl-names = "default";
-    
+
     /* Accelerometer for vibration monitoring */
     lis2dh@18 {
         compatible = "st,lis2dh";
@@ -116,7 +116,7 @@
     status = "okay";
     pinctrl-0 = <&pinmux_lpspi2>;
     pinctrl-names = "default";
-    
+
     /* External high-speed ADC */
     adc_ext: ads131m04@0 {
         compatible = "ti,ads131m04";

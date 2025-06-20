@@ -25,14 +25,14 @@ Function definitions
 zephyr_std_return_t zephyr_osal_start_os(zephyr_osal_app_mode_t app_mode)
 {
     LOG_INF("Starting Zephyr OS with app mode: %d", app_mode);
-    
+
     /* Initialize thread counters */
     for (int i = 0; i < CONFIG_MP_MAX_NUM_CPUS; i++) {
         for (int j = 0; j < ZEPHYR_OS_MAX_NUM_THREADS; j++) {
             zephyr_os_thread_counter[i][j] = 0;
         }
     }
-    
+
     return 0;
 }
 

@@ -133,36 +133,36 @@ static void openamp_comm_m7_task(void *p1, void *p2, void *p3)
 {
     bl_ipc_msg_t msg;
     int ret;
-    
+
     LOG_INF("OpenAMP M7 task started");
-    
+
     while (1) {
         /* Check for messages from M4 */
         ret = bl_ipc_recv_msg(&msg, K_MSEC(OPENAMP_COMM_PERIOD));
         if (ret == 0) {
-            LOG_DBG("Received message from M4: type=%d, len=%d", 
+            LOG_DBG("Received message from M4: type=%d, len=%d",
                     msg.msg_type, msg.data_len);
-            
+
             /* Process message based on type */
             switch (msg.msg_type) {
                 case BL_MSG_TYPE_SENSOR_DATA:
                     /* Forward sensor data to aggregation tasks */
                     break;
-                    
+
                 case BL_MSG_TYPE_ALARM_STATUS:
                     /* Process alarm status from M4 */
                     break;
-                    
+
                 case BL_MSG_TYPE_SYSTEM_STATUS:
                     /* Update system status */
                     break;
-                    
+
                 default:
                     LOG_WRN("Unknown message type: %d", msg.msg_type);
                     break;
             }
         }
-        
+
         k_msleep(OPENAMP_COMM_PERIOD);
     }
 }
@@ -174,11 +174,11 @@ static void openamp_comm_m7_task(void *p1, void *p2, void *p3)
 static void modbus_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("Modbus task started");
-    
+
     while (1) {
         /* TODO: Implement Modbus polling logic */
         LOG_DBG("Modbus polling cycle");
-        
+
         k_msleep(MODBUS_POLL_PERIOD);
     }
 }
@@ -190,11 +190,11 @@ static void modbus_task(void *p1, void *p2, void *p3)
 static void lte_mqtt_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("LTE/MQTT task started");
-    
+
     while (1) {
         /* TODO: Implement LTE/MQTT logic */
         LOG_DBG("LTE/MQTT processing");
-        
+
         k_msleep(LTE_MQTT_PERIOD);
     }
 }
@@ -206,11 +206,11 @@ static void lte_mqtt_task(void *p1, void *p2, void *p3)
 static void iec61850_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("IEC61850 task started");
-    
+
     while (1) {
         /* TODO: Implement IEC61850 logic */
         LOG_DBG("IEC61850 processing");
-        
+
         k_msleep(IEC61850_PERIOD);
     }
 }
@@ -222,11 +222,11 @@ static void iec61850_task(void *p1, void *p2, void *p3)
 static void ai_analytics_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("AI Analytics task started");
-    
+
     while (1) {
         /* TODO: Implement AI analytics logic */
         LOG_DBG("Running AI analytics");
-        
+
         k_msleep(AI_ANALYTICS_PERIOD);
     }
 }
@@ -238,11 +238,11 @@ static void ai_analytics_task(void *p1, void *p2, void *p3)
 static void fatfs_logging_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("FatFS logging task started");
-    
+
     while (1) {
         /* TODO: Implement FatFS logging logic */
         LOG_DBG("Logging data to SD card");
-        
+
         k_msleep(FATFS_LOGGING_PERIOD);
     }
 }
@@ -254,11 +254,11 @@ static void fatfs_logging_task(void *p1, void *p2, void *p3)
 static void fota_manager_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("FOTA Manager task started");
-    
+
     while (1) {
         /* TODO: Implement FOTA management logic */
         LOG_DBG("Checking for firmware updates");
-        
+
         k_msleep(FOTA_MANAGER_PERIOD);
     }
 }
@@ -271,18 +271,18 @@ static void fan_supervisor_task(void *p1, void *p2, void *p3)
 {
     bl_ipc_msg_t msg;
     LOG_INF("Fan Supervisor task started");
-    
+
     while (1) {
         /* TODO: Implement fan supervision logic */
         LOG_DBG("Fan supervision cycle");
-        
+
         /* Example: Send fan control command to M4 */
         msg.msg_type = BL_MSG_TYPE_FAN_CONTROL;
         msg.data_len = sizeof(uint32_t);
         /* Set fan control data */
-        
+
         bl_ipc_send_msg(&msg);
-        
+
         k_msleep(FAN_SUPERVISOR_PERIOD);
     }
 }
@@ -294,11 +294,11 @@ static void fan_supervisor_task(void *p1, void *p2, void *p3)
 static void calib_ui_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("Calibration UI task started");
-    
+
     while (1) {
         /* TODO: Implement calibration UI logic */
         LOG_DBG("Calibration UI processing");
-        
+
         k_msleep(CALIB_UI_PERIOD);
     }
 }
@@ -310,11 +310,11 @@ static void calib_ui_task(void *p1, void *p2, void *p3)
 static void freq_bushing_agg_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("Freq/Bushing aggregation task started");
-    
+
     while (1) {
         /* TODO: Implement data aggregation logic */
         LOG_DBG("Aggregating frequency/bushing data");
-        
+
         k_msleep(FREQ_BUSHING_AGG_PERIOD);
     }
 }
@@ -326,11 +326,11 @@ static void freq_bushing_agg_task(void *p1, void *p2, void *p3)
 static void env_agg_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("Environmental aggregation task started");
-    
+
     while (1) {
         /* TODO: Implement environmental data aggregation */
         LOG_DBG("Aggregating environmental data");
-        
+
         k_msleep(ENV_AGG_PERIOD);
     }
 }
@@ -342,11 +342,11 @@ static void env_agg_task(void *p1, void *p2, void *p3)
 static void alarm_cloud_task(void *p1, void *p2, void *p3)
 {
     LOG_INF("Alarm cloud task started");
-    
+
     while (1) {
         /* TODO: Implement cloud alarm logic */
         LOG_DBG("Processing cloud alarms");
-        
+
         k_msleep(ALARM_CLOUD_PERIOD);
     }
 }
@@ -427,7 +427,7 @@ void bl_app_1000ms(uint32_t core_id)
     /* 1s periodic processing - AI Analytics */
     static uint32_t seconds = 0;
     seconds++;
-    
+
     LOG_INF("M7 running for %u seconds", seconds);
 }
 
@@ -441,12 +441,12 @@ void bl_app_1000ms(uint32_t core_id)
 static int init_m7_peripherals(void)
 {
     LOG_INF("Initializing M7 peripherals");
-    
+
     /* TODO: Initialize LTE modem */
     /* TODO: Initialize SD card */
     /* TODO: Initialize Modbus interfaces */
     /* TODO: Initialize network interfaces */
-    
+
     return 0;
 }
 
@@ -456,7 +456,7 @@ static int init_m7_peripherals(void)
 static int create_m7_tasks(void)
 {
     LOG_INF("Creating M7 tasks");
-    
+
     /* Create OpenAMP communication task */
     k_thread_create(&openamp_comm_thread,
                     openamp_comm_stack,
@@ -466,7 +466,7 @@ static int create_m7_tasks(void)
                     OPENAMP_COMM_M7_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&openamp_comm_thread, "openamp_m7");
-    
+
     /* Create Modbus task */
     k_thread_create(&modbus_thread,
                     modbus_stack,
@@ -476,7 +476,7 @@ static int create_m7_tasks(void)
                     MODBUS_TASK_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&modbus_thread, "modbus");
-    
+
     /* Create LTE/MQTT task */
     k_thread_create(&lte_mqtt_thread,
                     lte_mqtt_stack,
@@ -486,7 +486,7 @@ static int create_m7_tasks(void)
                     LTE_MQTT_TASK_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&lte_mqtt_thread, "lte_mqtt");
-    
+
     /* Create IEC61850 task */
     k_thread_create(&iec61850_thread,
                     iec61850_stack,
@@ -496,7 +496,7 @@ static int create_m7_tasks(void)
                     IEC61850_TASK_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&iec61850_thread, "iec61850");
-    
+
     /* Create AI Analytics task */
     k_thread_create(&ai_analytics_thread,
                     ai_analytics_stack,
@@ -506,7 +506,7 @@ static int create_m7_tasks(void)
                     AI_ANALYTICS_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&ai_analytics_thread, "ai_analytics");
-    
+
     /* Create FatFS logging task */
     k_thread_create(&fatfs_logging_thread,
                     fatfs_logging_stack,
@@ -516,7 +516,7 @@ static int create_m7_tasks(void)
                     FATFS_LOGGING_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&fatfs_logging_thread, "fatfs_log");
-    
+
     /* Create FOTA manager task */
     k_thread_create(&fota_manager_thread,
                     fota_manager_stack,
@@ -526,7 +526,7 @@ static int create_m7_tasks(void)
                     FOTA_MANAGER_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&fota_manager_thread, "fota_mgr");
-    
+
     /* Create Fan supervisor task */
     k_thread_create(&fan_supervisor_thread,
                     fan_supervisor_stack,
@@ -536,7 +536,7 @@ static int create_m7_tasks(void)
                     FAN_SUPERVISOR_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&fan_supervisor_thread, "fan_super");
-    
+
     /* Create Calibration UI task */
     k_thread_create(&calib_ui_thread,
                     calib_ui_stack,
@@ -546,7 +546,7 @@ static int create_m7_tasks(void)
                     CALIB_UI_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&calib_ui_thread, "calib_ui");
-    
+
     /* Create Frequency/Bushing aggregation task */
     k_thread_create(&freq_bushing_agg_thread,
                     freq_bushing_agg_stack,
@@ -556,7 +556,7 @@ static int create_m7_tasks(void)
                     FREQ_BUSHING_AGG_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&freq_bushing_agg_thread, "freq_agg");
-    
+
     /* Create Environmental aggregation task */
     k_thread_create(&env_agg_thread,
                     env_agg_stack,
@@ -566,7 +566,7 @@ static int create_m7_tasks(void)
                     ENV_AGG_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&env_agg_thread, "env_agg");
-    
+
     /* Create Alarm cloud task */
     k_thread_create(&alarm_cloud_thread,
                     alarm_cloud_stack,
@@ -576,7 +576,7 @@ static int create_m7_tasks(void)
                     ALARM_CLOUD_PRIORITY,
                     0, K_NO_WAIT);
     k_thread_name_set(&alarm_cloud_thread, "alarm_cloud");
-    
+
     return 0;
 }
 
@@ -586,30 +586,30 @@ static int create_m7_tasks(void)
 static int bl_isw_t_main_m7_init(void)
 {
     int ret;
-    
+
     LOG_INF("=== Transformer Gateway M7 Core Initialization ===");
-    
+
     /* Initialize ISW for M7 */
     bl_isw_init_m7();
-    
+
     /* Initialize M7 peripherals */
     ret = init_m7_peripherals();
     if (ret != 0) {
         LOG_ERR("Failed to initialize peripherals: %d", ret);
         return ret;
     }
-    
+
     /* Create M7 specific tasks */
     ret = create_m7_tasks();
     if (ret != 0) {
         LOG_ERR("Failed to create tasks: %d", ret);
         return ret;
     }
-    
+
     /* Set system initialized */
     bl_set_system_initialized(true);
     system_initialized = true;
-    
+
     LOG_INF("M7 initialization complete");
     return 0;
 }
@@ -623,21 +623,21 @@ int main(void)
     LOG_INF("=== Transformer Monitoring Gateway System ===");
     LOG_INF("Core: %s", CURRENT_CORE);
     LOG_INF("Build: " __DATE__ " " __TIME__);
-    
+
     /* Initialize M7 core */
     bl_isw_t_main_m7_init();
-    
+
     /* Main loop */
     while (1) {
         /* Main thread can perform background tasks or sleep */
         k_msleep(1000);
-        
+
         /* Check system health */
         if (!system_initialized) {
             LOG_ERR("System not properly initialized!");
         }
     }
-    
+
     return 0;
 }
 

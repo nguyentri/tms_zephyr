@@ -1,2 +1,5 @@
 /.codellm
 /.dist
+.vscode
+/3rd_parties
+/build

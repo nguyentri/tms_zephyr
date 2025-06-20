@@ -2,63 +2,48 @@ manifest:
   remotes:
     - name: zephyrproject
       url-base: https://github.com/zephyrproject-rtos
-    - name: nxp
-      url-base: https://github.com/nxp-mcuxpresso
-  
+
   projects:
-    # Main Zephyr repository
     - name: zephyr
       remote: zephyrproject
       revision: v4.1.0
-      path: 3rd_parties/zephyr
       clone-depth: 1
       import:
-        path-prefix: 3rd_parties
+        path-prefix: 3rd_parties/zephyr
         name-allowlist:
           - cmsis
           - cmsis-dsp
+          - picolibc
+          - segger
           - hal_nxp
           - open-amp
           - libmetal
-          - fatfs
-          - mbedtls
-          - mcuboot
-    
-    # NXP HAL and SDK
-    - name: hal_nxp
-      path: 3rd_parties/hal_nxp
-      remote: nxp
-      revision: main
-    
-    # OpenAMP for inter-core communication
+
+    # Manually specified external modules (remain outside default module layout)
     - name: open-amp
       path: 3rd_parties/open-amp
       remote: zephyrproject
       revision: main
-    
-    # Libmetal for hardware abstraction
+
     - name: libmetal
       path: 3rd_parties/libmetal
       remote: zephyrproject
       revision: main
-    
-    # Cryptography library
+
     - name: mbedtls
       path: 3rd_parties/mbedtls
       remote: zephyrproject
-      revision: v3.4.0
-    
-    # Bootloader
+      revision: zephyr
+
     - name: mcuboot
       path: 3rd_parties/mcuboot
       remote: zephyrproject
       revision: v1.10.0
-    
-    # File system support
+
     - name: fatfs
       path: 3rd_parties/fatfs
       remote: zephyrproject
-      revision: main
-  
+      revision: master
+
   self:
     path: .

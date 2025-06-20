@@ -68,7 +68,7 @@ static void bl_ipc_bound_cb(void *priv)
 static void bl_ipc_recv_cb(const void *data, size_t len, void *priv)
 {
     bl_ipc_msg_t msg;
-    
+
     if (len <= sizeof(bl_ipc_msg_t)) {
         memcpy(&msg, data, len);
         k_msgq_put(&bl_ipc_rx_msgq, &msg, K_NO_WAIT);
@@ -85,17 +85,17 @@ int bl_osal_init(void)
     if (g_osal_context.initialized) {
         return 0;
     }
-    
+
     LOG_INF("Initializing OSAL");
-    
+
     /* Initialize thread handles */
     for (int i = 0; i < BL_OS_MAX_NUM_THREADS; i++) {
         g_osal_context.thread_handles[i] = NULL;
     }
-    
+
     g_osal_context.active_threads = 0;
     g_osal_context.initialized = true;
-    
+
     return 0;
 }
 
@@ -107,12 +107,12 @@ int bl_osal_create_thread(bl_thread_config_t *config, k_thread_entry_t entry)
     if (!config || !entry || config->thread_id >= BL_OS_MAX_NUM_THREADS) {
         return -EINVAL;
     }
-    
+
     if (g_osal_context.thread_handles[config->thread_id] != NULL) {
         LOG_WRN("Thread %u already exists", config->thread_id);
         return -EEXIST;
     }
-    
+
     g_osal_context.thread_handles[config->thread_id] = k_thread_create(
         &bl_thread_data[config->thread_id],
         bl_thread_stacks[config->thread_id],
@@ -123,17 +123,17 @@ int bl_osal_create_thread(bl_thread_config_t *config, k_thread_entry_t entry)
         0,
         K_NO_WAIT
     );
-    
+
     if (config->name) {
         k_thread_name_set(g_osal_context.thread_handles[config->thread_id], config->name);
     }
-    
+
     g_osal_context.active_threads++;
-    LOG_INF("Created thread %s (ID: %u, Priority: %u)", 
-            config->name ? config->name : "unnamed", 
-            config->thread_id, 
+    LOG_INF("Created thread %s (ID: %u, Priority: %u)",
+            config->name ? config->name : "unnamed",
+            config->thread_id,
             config->priority);
-    
+
     return 0;
 }
 
@@ -145,7 +145,7 @@ int bl_osal_start_thread(uint32_t thread_id)
     if (thread_id >= BL_OS_MAX_NUM_THREADS || !g_osal_context.thread_handles[thread_id]) {
         return -EINVAL;
     }
-    
+
     k_thread_start(g_osal_context.thread_handles[thread_id]);
     return 0;
 }
@@ -158,11 +158,11 @@ int bl_osal_stop_thread(uint32_t thread_id)
     if (thread_id >= BL_OS_MAX_NUM_THREADS || !g_osal_context.thread_handles[thread_id]) {
         return -EINVAL;
     }
-    
+
     k_thread_abort(g_osal_context.thread_handles[thread_id]);
     g_osal_context.thread_handles[thread_id] = NULL;
     g_osal_context.active_threads--;
-    
+
     return 0;
 }
 
@@ -190,26 +190,26 @@ int bl_osal_ipc_init(void)
 {
     const struct device *ipc_dev;
     int ret;
-    
+
     LOG_INF("Initializing IPC");
-    
+
     /* Get IPC device */
     ipc_dev = DEVICE_DT_GET(DT_NODELABEL(mu1));
     if (!device_is_ready(ipc_dev)) {
         LOG_ERR("IPC device not ready");
         return -ENODEV;
     }
-    
+
     /* Register IPC endpoint */
     ret = ipc_service_register_endpoint(ipc_dev, &bl_ipc_ept, &bl_ipc_ept_cfg);
     if (ret < 0) {
         LOG_ERR("Failed to register IPC endpoint: %d", ret);
         return ret;
     }
-    
+
     /* Wait for endpoint to be bound */
     k_sem_take(&bl_ipc_bound_sem, K_FOREVER);
-    
+
     LOG_INF("IPC initialized successfully");
     return 0;
 }
@@ -222,7 +222,7 @@ int bl_osal_ipc_send(void *data, size_t len)
     if (!data || len == 0 || len > BL_IPC_MSG_MAX_SIZE) {
         return -EINVAL;
     }
-    
+
     return ipc_service_send(&bl_ipc_ept, data, len);
 }
 
@@ -233,18 +233,18 @@ int bl_osal_ipc_recv(void *data, size_t len, k_timeout_t timeout)
 {
     bl_ipc_msg_t msg;
     int ret;
-    
+
     if (!data || len == 0) {
         return -EINVAL;
     }
-    
+
     ret = k_msgq_get(&bl_ipc_rx_msgq, &msg, timeout);
     if (ret == 0) {
         size_t copy_len = MIN(len, sizeof(msg));
         memcpy(data, &msg, copy_len);
         return copy_len;
     }
-    
+
     return ret;
 }
 
@@ -256,7 +256,7 @@ int bl_ipc_send_msg(bl_ipc_msg_t *msg)
     if (!msg) {
         return -EINVAL;
     }
-    
+
     msg->timestamp = bl_osal_get_tick_ms();
     return bl_osal_ipc_send(msg, sizeof(bl_ipc_msg_t));
 }
@@ -269,7 +269,7 @@ int bl_ipc_recv_msg(bl_ipc_msg_t *msg, k_timeout_t timeout)
     if (!msg) {
         return -EINVAL;
     }
-    
+
     return bl_osal_ipc_recv(msg, sizeof(bl_ipc_msg_t), timeout);
 }
 

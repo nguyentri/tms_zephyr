@@ -9,25 +9,25 @@
         compatible = "mmio-sram";
         reg = <0x200c0000 0x4000>; /* 16KB shared memory */
     };
-    
+
     /* Reserved memory regions */
     reserved-memory {
         #address-cells = <1>;
         #size-cells = <1>;
         ranges;
-        
+
         /* M4 code region */
         m4_code: m4_code@20200000 {
             reg = <0x20200000 0x40000>; /* 256KB for M4 code */
             no-map;
         };
-        
+
         /* Shared data region */
         shared_data: shared_data@20240000 {
             reg = <0x20240000 0x10000>; /* 64KB for shared data */
         };
     };
-    
+
     /* Aliases for easier access */
     aliases {
         led0 = &user_led;
@@ -35,7 +35,7 @@
         modbus0 = &lpuart1;
         console = &lpuart1;
     };
-    
+
     /* LEDs */
     leds {
         compatible = "gpio-leds";
@@ -48,7 +48,7 @@
             label = "Status LED";
         };
     };
-    
+
     /* Buttons */
     gpio_keys {
         compatible = "gpio-keys";
@@ -85,11 +85,11 @@
     pinctrl-names = "default";
     phy-mode = "rmii";
     phy-handle = <&phy>;
-    
+
     mdio {
         #address-cells = <1>;
         #size-cells = <0>;
-        
+
         phy: phy@0 {
             compatible = "ethernet-phy";
             reg = <0>;
@@ -116,7 +116,7 @@
     status = "okay";
     pinctrl-0 = <&pinmux_lpi2c1>;
     pinctrl-names = "default";
-    
+
     /* Temperature/Humidity sensor */
     sht3x@44 {
         compatible = "sensirion,sht3x";
