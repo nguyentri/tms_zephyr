@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20.0)
 
 # Set default Zephyr base if not already defined
 if(NOT DEFINED ZEPHYR_BASE)
-    set(ZEPHYR_BASE ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/zephyr)
+    set(ZEPHYR_BASE ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/zephyr/zephyr)
 endif()
 
 # Multi-image build configuration for MIMXRT1160 dual-core
@@ -11,7 +11,7 @@ if(SYSBUILD)
 
     # Additional module paths for third-party components
     list(APPEND ZEPHYR_EXTRA_MODULES
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/hal_nxp
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/zephyr/modules
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/open-amp
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/libmetal
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/mbedtls
@@ -49,7 +49,7 @@ else()
 
     # Additional module paths for third-party components
     list(APPEND ZEPHYR_EXTRA_MODULES
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/hal_nxp
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/zephyr/modules
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/open-amp
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/libmetal
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/mbedtls
@@ -72,7 +72,7 @@ endif()
 
 # Global include directories for third-party modules
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/hal_nxp/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/zephyr/modules
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/open-amp/lib/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/libmetal/lib/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd_parties/mbedtls/include

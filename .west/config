@@ -3,5 +3,5 @@ path = west-manifest
 file = west.yml
 
 [zephyr]
-base = 3rd_parties/zephyr
+base = 3rd_parties/zephyr/zephyr
 

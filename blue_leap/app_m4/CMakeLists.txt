@@ -3,8 +3,11 @@ cmake_minimum_required(VERSION 3.20.0)
 
 # Set Zephyr base if building standalone
 if(NOT DEFINED ZEPHYR_BASE)
-    set(ZEPHYR_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../3rd_parties/zephyr)
+    set(ZEPHYR_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../3rd_parties/zephyr/zephyr)
 endif()
+
+# Explicitly set the project configuration file
+set(CONF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/prj.conf)
 
 find_package(Zephyr REQUIRED HINTS ${ZEPHYR_BASE})
 project(transformer_gateway_m4)
