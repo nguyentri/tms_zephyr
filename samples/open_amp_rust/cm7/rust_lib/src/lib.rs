@@ -89,6 +89,7 @@ pub extern "C" fn rust_openamp_send_message(message: *const c_char) -> c_int {
 ///
 /// The caller must ensure that `data` points to a valid buffer of at least `len` bytes.
 #[no_mangle]
+#[allow(unused_variables)]
 pub extern "C" fn rust_openamp_process_received(data: *const c_char, len: usize) {
     if !INITIALIZED.load(Ordering::Relaxed) {
         return;

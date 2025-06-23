@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.20.0)
 # Copyright (c) 2018 Nordic Semiconductor ASA
 # Copyright (c) 2019 Linaro Limited
 # Copyright 2022 NXP
@@ -43,7 +42,7 @@ add_custom_command(
     OUTPUT ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a
     COMMAND ${CMAKE_COMMAND} -E env
         CARGO_TARGET_DIR=${RUST_TARGET_DIR}
-        RUSTFLAGS="-C target-cpu=cortex-m7"
+        "RUSTFLAGS=-C target-cpu=cortex-m7"
         ${CARGO} build --release --target ${RUST_TARGET}
     WORKING_DIRECTORY ${RUST_LIB_DIR}
     DEPENDS ${RUST_LIB_DIR}/src/lib.rs ${RUST_LIB_DIR}/Cargo.toml

@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.20.0)
 # Copyright (c) 2018 Nordic Semiconductor ASA
 # Copyright (c) 2019 Linaro Limited
 # Copyright 2022 NXP
