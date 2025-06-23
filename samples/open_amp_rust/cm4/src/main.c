@@ -1,135 +1,102 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2024, Blue-leap
+ *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <zephyr/kernel.h>
-#include <zephyr/device.h>
-#include <zephyr/logging/log.h>
-#include <zephyr/ipc/ipc_service.h>
+#include <openamp_common.h>
 
-#ifdef CONFIG_OPENAMP_SYSBUILD
-#include <zephyr_image_info.h>
-#endif
+LOG_MODULE_REGISTER(cm4_main, LOG_LEVEL_DBG);
 
-// Register a logging module for this file (CM4 main)
-LOG_MODULE_REGISTER(cm4_main, LOG_LEVEL_INF);
+/* Local endpoint */
+static struct ipc_ept ep;
+
+/* Semaphore to wait for endpoint binding */
+static K_SEM_DEFINE(bound_sem, 0, 1);
 
 /*
- * Rust FFI function declarations
- * These are implemented in the Rust staticlib and linked into the Zephyr app.
- * - rust_openamp_init_cm4: Initialize Rust-side OpenAMP state
- * - rust_openamp_send_message_cm4: Log and count messages sent from Rust
- * - rust_openamp_process_received_cm4: Process incoming messages in Rust
+ * @brief Endpoint bound callback
+ *
+ * This function is called when the remote core binds to the endpoint.
+ *
+ * @param priv Private data
  */
-extern void rust_openamp_init_cm4(void);
-extern int rust_openamp_send_message_cm4(const char* message);
-extern void rust_openamp_process_received_cm4(const char* data, size_t len);
-
-// IPC endpoint structure and state
-static struct ipc_ept ep;
-static bool endpoint_bound = false;
-
-// Callback: called when the endpoint is bound (ready for communication)
 static void ep_bound(void *priv)
 {
-    LOG_INF("CM4: Endpoint bound");
-    endpoint_bound = true;
+	LOG_INF("IPC endpoint bound");
+	k_sem_give(&bound_sem);
 }
 
-// Callback: called when a message is received from the remote core
+/*
+ * @brief Message reception callback
+ *
+ * This function is called when a message is received from the remote core.
+ *
+ * @param data Received data
+ * @param len Length of the received data
+ * @param priv Private data
+ */
 static void ep_recv(const void *data, size_t len, void *priv)
 {
-    LOG_INF("CM4: Received message: %.*s", (int)len, (char *)data);
-
-    // Forward the received message to Rust for further processing
-    rust_openamp_process_received_cm4((const char*)data, len);
+	rust_openamp_process_received(data, len);
 }
 
-// IPC endpoint configuration: name and callbacks
-static struct ipc_ept_cfg ep_cfg = {
-    .name = "ep0", // Endpoint name (must match remote side)
-    .cb = {
-        .bound = ep_bound,    // Called when endpoint is ready
-        .received = ep_recv,  // Called on message reception
-    },
+static const struct ipc_ept_cfg ep_cfg = {
+	.name = "ep0",
+	.cb = {
+		.bound = ep_bound,
+		.received = ep_recv,
+	},
 };
 
 int main(void)
 {
-    const struct device *ipc0_instance;
-    int ret;
+	const struct device *const ipc0_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
+	int ret;
 
-    LOG_INF("OpenAMP Rust CM4 Application started");
+	LOG_INF("Starting CM4 application");
 
-#ifdef CONFIG_OPENAMP_SYSBUILD
-    LOG_INF("Running in sysbuild mode");
-    #ifdef CM7_IMAGE_SIZE
-    LOG_INF("CM7 image size: %d bytes", CM7_IMAGE_SIZE);
-    #endif
-#else
-    LOG_INF("Running in single-core mode");
+	/* Initialize Rust OpenAMP library */
+	rust_openamp_init();
+
+#if defined(CONFIG_OPENAMP_SYSBUILD)
+	/* In sysbuild mode, the M7 core brings up the IPC, so we wait for it */
+	while (!device_is_ready(ipc0_instance)) {
+		k_sleep(K_MSEC(100));
+	}
 #endif
 
-    // Initialize Rust OpenAMP state (logging, counters, etc.)
-    rust_openamp_init_cm4();
+	ret = ipc_service_open_instance(ipc0_instance);
+	if (ret < 0 && ret != -EALREADY) {
+		LOG_ERR("Failed to open IPC instance: %d", ret);
+		return ret;
+	}
 
-    // Get the IPC device instance (must match devicetree label)
-    ipc0_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
-    if (!device_is_ready(ipc0_instance)) {
-        LOG_ERR("IPC instance is not ready");
-        return -ENODEV;
-    }
+	ret = ipc_service_register_endpoint(ipc0_instance, &ep, &ep_cfg);
+	if (ret < 0) {
+		LOG_ERR("Failed to register endpoint: %d", ret);
+		return ret;
+	}
 
-    // Open the IPC service instance (idempotent)
-    ret = ipc_service_open_instance(ipc0_instance);
-    if (ret < 0 && ret != -EALREADY) {
-        LOG_ERR("Failed to open IPC instance: %d", ret);
-        return ret;
-    }
+	/* Wait for the endpoint to be bound by the remote core */
+	k_sem_take(&bound_sem, K_FOREVER);
 
-    // Register the endpoint for communication
-    ret = ipc_service_register_endpoint(ipc0_instance, &ep, &ep_cfg);
-    if (ret < 0) {
-        LOG_ERR("Failed to register endpoint: %d", ret);
-        return ret;
-    }
+	while (1) {
+		char message[64];
+		static uint32_t count = 0;
 
-    // Wait for the endpoint to be bound by the remote core
-    LOG_INF("Waiting for endpoint to be bound...");
-    while (!endpoint_bound) {
-        k_sleep(K_MSEC(100));
-    }
+		/* Format the message to be sent */
+		snprintf(message, sizeof(message), "Hello from CM4, count: %u", count++);
 
-    LOG_INF("Endpoint bound, starting communication...");
-    k_sleep(K_SECONDS(1)); // Optional: allow remote to get ready
+		/* Send the message to the remote core */
+		rust_openamp_send_message(message);
+		ret = ipc_service_send(&ep, message, strlen(message));
+		if (ret < 0) {
+			LOG_ERR("Failed to send message: %d", ret);
+		}
 
-    /*
-     * Main message loop:
-     * - Compose a message string
-     * - Log and count it in Rust (rust_openamp_send_message_cm4)
-     * - Send it over the IPC endpoint
-     * - Wait before sending the next message
-     */
-    for (int i = 0; i < 10; i++) {
-        char msg[64];
-        snprintf(msg, sizeof(msg), "Hello from CM4 (Rust) - Message %d", i);
+		k_msleep(1000);
+	}
 
-        // Log and count the message in Rust
-        ret = rust_openamp_send_message_cm4(msg);
-        if (ret < 0) {
-            LOG_ERR("Failed to send message via Rust: %d", ret);
-        } else {
-            // Send the message over the Zephyr IPC service
-            ret = ipc_service_send(&ep, msg, strlen(msg));
-            if (ret < 0) {
-                LOG_ERR("Failed to send IPC message: %d", ret);
-            }
-        }
-
-        k_sleep(K_SECONDS(2)); // Delay between messages
-    }
-
-    LOG_INF("CM4 communication test completed");
-    return 0;
+	return 0;
 }

@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "rust_openamp_cm7"
+name = "rust_openamp"
 version = "0.1.0"

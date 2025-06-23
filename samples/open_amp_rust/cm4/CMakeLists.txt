@@ -19,10 +19,10 @@ message(STATUS "${BOARD} compiles as the Remote in this sample")
 target_sources(app PRIVATE src/main.c)
 # Add include directories
 target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common)
+target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common/include)
 
 # Add rust library
-add_dependencies(app rust_lib_cm4)
+add_dependencies(app rust_lib)
 
 # Rust library configuration
 set(RUST_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rust_lib)
@@ -32,7 +32,7 @@ set(RUST_TARGET thumbv7m-none-eabi)
 
 # Build Rust library
 add_custom_command(
-    OUTPUT ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp_cm4.a
+    OUTPUT ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a
     COMMAND ${CMAKE_COMMAND} -E env
         CARGO_TARGET_DIR=${RUST_TARGET_DIR}
         ${CARGO} build --release --target ${RUST_TARGET}
@@ -41,9 +41,9 @@ add_custom_command(
     COMMENT "Building Rust library for CM4"
 )
 
-add_custom_target(rust_lib_cm4 ALL
-    DEPENDS ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp_cm4.a
+add_custom_target(rust_lib ALL
+    DEPENDS ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a
 )
 
 # Link Rust library
-target_link_libraries(app PRIVATE ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp_cm4.a)
+target_link_libraries(app PRIVATE ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a)

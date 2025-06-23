@@ -23,14 +23,14 @@ target_sources(app PRIVATE src/main.c)
 
 # Add include directories
 target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common)
+target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common/include)
 if(CONFIG_INCLUDE_REMOTE_DIR)
   target_include_directories(zephyr_interface
     INTERFACE ${CM4_BIN_ZEPHYR_DIR}/include/public)
 endif()
 
 # Add rust library
-add_dependencies(app rust_lib_cm7)
+add_dependencies(app rust_lib)
 
 # Rust library configuration
 set(RUST_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rust_lib)
@@ -40,7 +40,7 @@ set(RUST_TARGET thumbv7m-none-eabi)
 
 # Build Rust library
 add_custom_command(
-    OUTPUT ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp_cm7.a
+    OUTPUT ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a
     COMMAND ${CMAKE_COMMAND} -E env
         CARGO_TARGET_DIR=${RUST_TARGET_DIR}
         RUSTFLAGS="-C target-cpu=cortex-m7"
@@ -50,9 +50,9 @@ add_custom_command(
     COMMENT "Building Rust library for CM7"
 )
 
-add_custom_target(rust_lib_cm7 ALL
-    DEPENDS ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp_cm7.a
+add_custom_target(rust_lib ALL
+    DEPENDS ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a
 )
 
 # Link Rust library
-target_link_libraries(app PRIVATE ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp_cm7.a)
+target_link_libraries(app PRIVATE ${RUST_TARGET_DIR}/${RUST_TARGET}/release/librust_openamp.a)
