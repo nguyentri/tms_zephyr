@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2022 NXP
  *
@@ -21,4 +22,9 @@
 		zephyr,memory-region="OCRAM2_OVERLAY";
 		zephyr,memory-attr = <( DT_MEM_ARM(ATTR_MPU_IO) )>;
 	};
+};
+
+&lpuart1 {
+	status = "okay";
+	current-speed = <115200>;
 };
