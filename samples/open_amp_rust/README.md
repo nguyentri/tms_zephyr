@@ -127,8 +127,8 @@ This sample includes several improvements over basic OpenAMP examples:
 ## Usage
 
 1. Flash the application to the MIMXRT1160-EVK
-2. Connect to the serial console (115200 baud)
-3. Observe the message exchange between cores:
+2. Connect to the serial console (115200 baud) for uart1 (CM7) and uart2 (CM4)
+3. Observe the logs for message exchanges between the CM7 and CM4 cores:
 
 ```
 [00:00:00.123,000] <inf> cm7_main: Starting CM7 application

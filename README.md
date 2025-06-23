@@ -1,96 +1,138 @@
+
 # MIMXRT1160-EVK Dual-Core Transformer Gateway Project
+
+---
+
+## Overview
+
+This project demonstrates a dual-core application for the NXP MIMXRT1160-EVK board using Zephyr RTOS. It leverages the Cortex-M7 and Cortex-M4 cores to run coordinated tasks, showcasing multi-core communication and processing.
+
+---
 
 ## Prerequisites
 
-1. Install Zephyr SDK
-2. Install West tool
-3. Install required dependencies
+Before you begin, ensure you have the following installed and configured:
+
+- **Zephyr SDK** (compatible version)
+- **West tool** (Zephyr's meta-tool for managing projects)
+- Required system dependencies (e.g., Python, CMake, Ninja, device drivers)
+
+Refer to the [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html) for detailed installation instructions.
+
+---
 
 ## Setup Instructions
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
-cd transformer-gateway
+cd tms-zephyr
 ```
 
-### 2. Initialize West Workspace
+### 2. Initialize and Update West Workspace
+
 ```bash
-# Initialize west manifest
+# Initialize west with the project manifest
 west init -m <repository-url> .
 
-# Fetch all dependencies
+# Fetch all project dependencies
 west update
 ```
 
 ### 3. Set Up Zephyr Environment
+
 ```bash
-# Source Zephyr environment
+# Source the Zephyr environment variables
 source 3rd_parties/zephyr/zephyr-env.sh
 ```
 
 ### 4. Build Sample Application
+
+To build a sample application, specify the board, core, and sample path:
+
 ```bash
-# Build the sample application for MIMXRT1160-EVK
-west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/<sample_name> -p always
-For example, to build the hello world sample:
-west build -b mimxrt1160_evk/mimxrt1166/cm7 samples/hello_world -p always
+west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/<sample_name>/<core_name> -p always
 ```
 
-### 4. Build Project
+For example, to build the OpenAMP Rust "hello world" sample on the Cortex-M7 core:
+
+```bash
+west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/open_amp_rust/cm7 -p always
+```
+
+### 5. Build the Full Project
 
 #### Multi-Core Build (Recommended)
+
 ```bash
-# Build both M4 and M7 cores
-west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild
+west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild -p always
 ```
 
-#### Single-Core Builds (Development)
-```bash
-# Build M4 Core
-west build -b mimxrt1160_evk/mimxrt1166/cm4 blue_leap/app_m4
+#### Single-Core Builds (Not Recommended / Not Supported)
 
-# Build M7 Core
-west build -b mimxrt1160_evk/mimxrt1166/cm7 blue_leap/app_m7
+```bash
+# Build Cortex-M4 core application
+west build -b mimxrt1160_evk/mimxrt1166/cm4 blue_leap/cm4
+
+# Build Cortex-M7 core application
+west build -b mimxrt1160_evk/mimxrt1166/cm7 blue_leap/cm7
 ```
 
-### 5. Flash the Device
+### 6. Flash the Device
+
 ```bash
-# Flash both cores (M4 first, then M7)
 west flash
 ```
 
+---
+
 ## Troubleshooting
 
-- Ensure all dependencies are correctly fetched with `west update`
-- Check Zephyr SDK version compatibility
-- Verify board support package for MIMXRT1160-EVK
+- Run `west update` to ensure all dependencies are up to date.
+- Verify your Zephyr SDK version matches the project requirements.
+- Confirm the MIMXRT1160-EVK board support package is correctly installed.
+- Check environment variables are properly sourced.
+- For build errors, clean the build directory with `west build -t clean` and rebuild.
+
+---
 
 ## Project Structure
 
 ```
 .
-├── 3rd_parties/           # Third-party dependencies
+├── 3rd_parties/           # Third-party dependencies (Zephyr, HAL, OpenAMP, etc.)
 │   ├── zephyr/
 │   ├── hal_nxp/
 │   ├── open-amp/
 │   └── ...
-├── blue_leap/
-│   ├── app_isw/           # Integrated Software Library
-│   ├── app_m4/            # M4 Core Application
-│   └── app_m7/            # M7 Core Application
+├── samples/               # Sample applications shared between cores
+│   ├── open_amp_rust/     # OpenAMP Rust sample
+│   │   ├── cm4/           # Cortex-M4 specific code
+│   │   ├── cm7/           # Cortex-M7 specific code
+│   │   └── common/        # Shared code for both cores
+├── blue_leap/             # Project-specific applications
+│   ├── cm4/               # Cortex-M4 core code
+│   ├── cm7/               # Cortex-M7 core code
+│   └── common/            # Shared code for both cores
 ├── CMakeLists.txt         # Top-level build configuration
 ├── west-manifest/
-│   └── west.yml           # West manifest file
+│   └── west.yml           # West manifest file for dependencies
 └── sysbuild.conf          # Multi-image build configuration
 ```
 
+---
+
 ## Supported Configurations
 
-- Board: MIMXRT1160-EVK
-- Cores: Cortex-M7 + Cortex-M4
-- RTOS: Zephyr v4.1.0
+- **Board:** MIMXRT1160-EVK
+- **Cores:** Dual-core (Cortex-M7 + Cortex-M4)
+- **RTOS:** Zephyr v4.1.0
+
+---
 
 ## License
 
-[Specify your project license]
+[Specify your project license here, e.g., MIT, Apache 2.0, etc.]
+
+---
