@@ -29,6 +29,14 @@ west update
 source 3rd_parties/zephyr/zephyr-env.sh
 ```
 
+### 4. Build Sample Application
+```bash
+# Build the sample application for MIMXRT1160-EVK
+west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/<sample_name> -p always
+For example, to build the hello world sample:
+west build -b mimxrt1160_evk/mimxrt1166/cm7 samples/hello_world -p always
+```
+
 ### 4. Build Project
 
 #### Multi-Core Build (Recommended)
