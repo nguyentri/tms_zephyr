@@ -10,7 +10,7 @@ set(CM4_BIN_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../cm4/zephyr)
 
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(openamp)
+project(openamp_cm7)
 
 message(STATUS "${BOARD} compile as Master in this sample")
 

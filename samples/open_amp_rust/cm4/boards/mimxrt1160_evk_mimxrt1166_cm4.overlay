@@ -4,15 +4,30 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
 #include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
 
 / {
-	/* Switch to lpuart2, since primary core uses lpuart1 */
 	chosen {
 		zephyr,flash = &ocram;
 		zephyr,console = &lpuart2;
 		zephyr,shell-uart = &lpuart2;
-		zephyr,ipc_shm = &ocram2_overlay;
+
+		/* Delete ipc chosen property where old IPM mailbox driver below is
+		 * configured.
+		 */
+		/delete-property/ zephyr,ipc;
+		/delete-property/ zephyr,ipc_shm;
+	};
+
+	/* Define memory regions for IPC
+	 * Note that shared memory must have specific MPU attributes set.
+	 */
+	ocram2_ipc0: memory@202c0000{
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x202c0000 DT_SIZE_K(32)>;
+		zephyr,memory-region="OCRAM2_IPC0";
+		zephyr,memory-attr = <( DT_MEM_ARM(ATTR_MPU_IO))>;
 	};
 
 	soc {
@@ -25,17 +40,32 @@
 			interrupts = <120 0>;
 			status = "okay";
 		};
+
+		/* Delete IPM Driver node nxp,imx-mu */
+		/delete-node/ mailbox@40c4c000;
+
+		/* Attach MBOX driver to MU Unit */
+		mbox:mbox@40c4c000 {
+			compatible = "nxp,mbox-imx-mu";
+			reg = <0x40c4c000 0x4000>;
+			interrupts = <118 0>;
+			rx-channels = <4>;
+			#mbox-cells = <1>;
+			status = "okay";
+		};
 	};
 
-	/* OpenAMP fails with full 512K OCRAM2 memory region as shared memory.
-	 * Define a subset of the OCRAM2 region for demo to use
-	 * Note that shared memory must have specific MPU attributes set
-	 */
-	ocram2_overlay: memory@202c0000 {
-		compatible = "zephyr,memory-region", "mmio-sram";
-		reg = <0x202c0000 DT_SIZE_K(16)>;
-		zephyr,memory-region="OCRAM2_OVERLAY";
-		zephyr,memory-attr = <( DT_MEM_ARM(ATTR_MPU_IO) )>;
+	ipc {
+		/delete-node/ ipc0;
+
+		ipc0: ipc0 {
+			compatible = "zephyr,ipc-openamp-static-vrings";
+			memory-region = <&ocram2_ipc0>;
+			mboxes = <&mbox 0>, <&mbox 1>;
+			mbox-names = "rx", "tx";
+			role = "remote";
+			status = "okay";
+		};
 	};
 };
 

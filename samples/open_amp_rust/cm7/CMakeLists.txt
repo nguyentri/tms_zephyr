@@ -12,8 +12,7 @@ set(CM4_BIN_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../cm4/zephyr)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
-project(openamp)
-
+project(openamp_rust_cm7)
 
 # Add Rust support
 find_program(CARGO cargo REQUIRED)

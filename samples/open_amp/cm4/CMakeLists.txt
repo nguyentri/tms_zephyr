@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.20.0)
 
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(cm4)
+project(openamp_cm4)
 message(STATUS "${BOARD} compiles as remote in this sample")
 
 target_sources(app PRIVATE src/main.c)
