@@ -1,2 +1,0 @@
-# sysbuild.cmake has been removed to support single-core builds.
-# For multi-core sysbuild, keep a backup or move to a separate directory.
