@@ -74,12 +74,8 @@ samples/open_amp_rust/
 ### Build Commands
 
 ```bash
-# Build both cores using sysbuild (recommended)
-west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/open_amp_rust -p always
-
-# Or build individual cores
-west build -b mimxrt1160_evk/mimxrt1166/cm7 samples/open_amp_rust/cm7 -p always
-west build -b mimxrt1160_evk/mimxrt1166/cm4 samples/open_amp_rust/cm4 -p always
+# Build both cores using West
+west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/open_amp_rust/cm7 -p always
 ```
 
 ## Configuration

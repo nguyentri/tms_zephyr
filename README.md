@@ -66,7 +66,8 @@ west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild samples/open_amp_rust/cm7
 #### Multi-Core Build (Recommended)
 
 ```bash
-west build -b mimxrt1160_evk/mimxrt1166/cm7 --sysbuild -p always
+# west build -b mimxrt1160_evk/mimxrt1166/cm7 blue_leap/
+west build -b mimxrt1160_evk/mimxrt1166/cm7 blue_leap/cm7
 ```
 
 #### Single-Core Builds (Not Recommended / Not Supported)
